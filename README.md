@@ -106,6 +106,18 @@ low-level API.
 *Note: in this example the salt is set to the all-`0x00` string, but in
 your application you should use a random salt.*
 
+## For Windows users
+
+### Multithreading
+
+Argon2 implements multi-threading in Windows using the `pthreads-win32` library (https://www.sourceware.org/pthreads-win32/).
+For Visual Studio you have to install the necessary DLL and LIB files as follows:
+	1. Copy pthreadVC2.dll from pthreads-win32\dll\x86\ (for 32-bit projects) or pthreads-win32\dll\x64 (for 64-bit projects)
+	to C:\Windows .
+	2. Copy pthreadVC2.lib from pthreads-win32\lib\x86\ (for 32-bit projects) or pthreads-win32\lib\x64 (for 64-bit projects)
+	to [Visual Studio installation path]\VC\lib .
+	3. In the Visual Studio project go to Properties\Linker\Input\Additional Dependencies and add pthreadVC2.lib .
+
 ## Intellectual property
 
 Argon2 code is copyright (c) 2015 Daniel Dinu and Dmitry Khovratovich,

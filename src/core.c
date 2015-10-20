@@ -22,20 +22,31 @@
 
 
 #include <inttypes.h>
-#ifndef _MSC_VER
-#include <pthread.h>
-#endif
+
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+/******Multi-threading headers*******/
+#ifndef _MSC_VER
+#include <pthread.h>
+#else 
+#include "../pthreads-win32/include/pthread.h"
+#endif
+
+/************Blake2 headers*********/
+#include "blake2/blake2.h"
+#include "blake2/blake2-impl.h"
+
+/*********Argon2 headers*********/
 #include "argon2.h"
 #include "core.h"
 #include "kat.h"
 
 
-#include "blake2/blake2.h"
-#include "blake2/blake2-impl.h"
 
 #if defined(__clang__)
 #if __has_attribute(optnone)
@@ -265,7 +276,6 @@ void fill_memory_blocks( Argon2_instance_t *instance )
     {
         for ( uint8_t s = 0; s < ARGON2_SYNC_POINTS; ++s )
         {
-#ifndef _MSC_VER
             //1. Allocating space for threads
             pthread_t *thread = malloc( sizeof( pthread_t )*( instance->lanes ) );
             Argon2_thread_data *thr_data = malloc( sizeof( Argon2_thread_data )*( instance->lanes ) );
@@ -314,13 +324,6 @@ void fill_memory_blocks( Argon2_instance_t *instance )
             free( thread );
             pthread_attr_destroy( &attr );
             free( thr_data );
-#else   //No threads for Windows
-			for (uint32_t l = 0; l < instance->lanes; ++l)
-			{
-				Argon2_position_t position = { r, l, s, 0 };
-				fill_segment(instance, position);
-			}
-#endif
         }
 
         if( instance->print_internals )
@@ -678,12 +681,9 @@ int argon2_core( Argon2_Context *context, Argon2_type type )
 
     return ARGON2_OK;
 }
-
-#ifndef _MSC_VER  /* No threads for Windows*/
 void *fill_segment_thr( void *thread_data )
 {
     Argon2_thread_data *my_data = ( Argon2_thread_data * )thread_data;
     fill_segment( my_data->instance_ptr, my_data->pos );
     pthread_exit( thread_data );
 }
-#endif
