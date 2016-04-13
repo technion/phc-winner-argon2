@@ -169,6 +169,7 @@ static void blake2b_compress(blake2b_state *S, const uint8_t *block) {
 
 #define G(r, i, a, b, c, d)                                                    \
     do {                                                                       \
+        Frama_C_show_each_index(blake2b_sigma[r][2*i+0]);  \
         a = a + b + m[blake2b_sigma[r][2 * i + 0]];                            \
         d = rotr64(d ^ a, 32);                                                 \
         c = c + d;                                                             \
@@ -191,6 +192,7 @@ static void blake2b_compress(blake2b_state *S, const uint8_t *block) {
         G(r, 7, v[3], v[4], v[9], v[14]);                                      \
     } while ((void)0, 0)
 
+    Frama_C_show_each_m(m);
     for (r = 0; r < 12; ++r) {
         ROUND(r);
     }
