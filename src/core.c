@@ -93,6 +93,7 @@ int allocate_memory(block **memory, uint32_t m_cost) {
         if (!*memory) {
             return ARGON2_MEMORY_ALLOCATION_ERROR;
         }
+        memset(*memory, 'd', memory_size); 
         return ARGON2_OK;
     } else {
         return ARGON2_MEMORY_ALLOCATION_ERROR;
@@ -245,7 +246,7 @@ static void *fill_segment_thr(void *thread_data)
 {
     argon2_thread_data *my_data = (argon2_thread_data *)thread_data;
     fill_segment(my_data->instance_ptr, my_data->pos);
-    argon2_thread_exit();
+    /* argon2_thread_exit(); */
     return 0;
 }
 
@@ -281,7 +282,7 @@ int fill_memory_blocks(argon2_instance_t *instance) {
 
                 /* 2.1 Join a thread if limit is exceeded */
                 if (l >= instance->threads) {
-                    rc = argon2_thread_join(thread[l - instance->threads]);
+                    /* rc = argon2_thread_join(thread[l - instance->threads]); */
                     if (rc) {
                         free(thr_data);
                         free(thread);
@@ -298,8 +299,9 @@ int fill_memory_blocks(argon2_instance_t *instance) {
                     instance; /* preparing the thread input */
                 memcpy(&(thr_data[l].pos), &position,
                        sizeof(argon2_position_t));
-                rc = argon2_thread_create(&thread[l], &fill_segment_thr,
-                                          (void *)&thr_data[l]);
+/*                rc = argon2_thread_create(&thread[l], &fill_segment_thr,
+                                          (void *)&thr_data[l]); */
+                fill_segment_thr(&thr_data[l]);
                 if (rc) {
                     free(thr_data);
                     free(thread);
@@ -310,14 +312,14 @@ int fill_memory_blocks(argon2_instance_t *instance) {
                 /*Non-thread equivalent of the lines above */
             }
 
-            /* 3. Joining remaining threads */
+            /* 3. Joining remaining threads 
             for (l = instance->lanes - instance->threads; l < instance->lanes;
                  ++l) {
                 rc = argon2_thread_join(thread[l]);
                 if (rc) {
                     return ARGON2_THREAD_FAIL;
                 }
-            }
+            } */
         }
 
 #ifdef GENKAT
@@ -600,6 +602,7 @@ int initialize(argon2_instance_t *instance, argon2_context *context) {
 
     /* 3. Creating first blocks, we always have at least two blocks in a slice
      */
+    /* Frama_C_dump_each(instance->memory); */
     fill_first_blocks(blockhash, instance);
     /* Clearing the hash */
     secure_wipe_memory(blockhash, ARGON2_PREHASH_SEED_LENGTH);

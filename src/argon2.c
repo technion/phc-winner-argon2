@@ -103,6 +103,7 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
     }
 
     out = malloc(hashlen);
+    memset(out, 'd', hashlen);
     if (!out) {
         return ARGON2_MEMORY_ALLOCATION_ERROR;
     }

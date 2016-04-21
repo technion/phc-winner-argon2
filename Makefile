@@ -13,13 +13,13 @@ GENKAT = genkat
 
 DIST = phc-winner-argon2
 
-SRC = src/argon2.c src/core.c src/blake2/blake2b.c src/thread.c src/encoding.c
+SRC = src/argon2.c src/core.c src/blake2/blake2b.c src/encoding.c
 SRC_RUN = src/run.c
 SRC_BENCH = src/bench.c
 SRC_GENKAT = src/genkat.c
 OBJ = $(SRC:.c=.o)
 
-CFLAGS += -std=c89 -pthread -O3 -Wall -g -Iinclude -Isrc
+CFLAGS += -std=c89 -O3 -Wall -g -Iinclude -Isrc
 CI_CFLAGS := $(CFLAGS) -Werror=declaration-after-statement -D_FORTIFY_SOURCE=2 \
 				-Wextra -Wno-type-limits -Werror -coverage -DTEST_LARGE_RAM
 
