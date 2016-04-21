@@ -103,7 +103,6 @@ int argon2_hash(const uint32_t t_cost, const uint32_t m_cost,
     }
 
     out = malloc(hashlen);
-    memset(out, 'd', hashlen);
     if (!out) {
         return ARGON2_MEMORY_ALLOCATION_ERROR;
     }
@@ -227,6 +226,8 @@ int argon2_verify(const char *encoded, const void *pwd, const size_t pwdlen,
     ctx.free_cbk = NULL;
     ctx.secret = NULL;
     ctx.secretlen = 0;
+    ctx.pwdlen = 0;
+    ctx.pwd = NULL;
     ctx.ad = malloc(ctx.adlen);
     ctx.salt = malloc(ctx.saltlen);
     ctx.out = malloc(ctx.outlen);

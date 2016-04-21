@@ -101,6 +101,9 @@ int allocate_memory(block **memory, uint32_t m_cost) {
 }
 
 void NOT_OPTIMIZED secure_wipe_memory(void *v, size_t n) {
+    if (0 == n) {
+        return;
+    }
 #if defined(_MSC_VER) && VC_GE_2005(_MSC_VER)
     SecureZeroMemory(v, n);
 #elif defined memset_s
@@ -109,7 +112,6 @@ void NOT_OPTIMIZED secure_wipe_memory(void *v, size_t n) {
     explicit_bzero(v, n);
 #else
     /* static void *(*const volatile memset_sec)(void *, int, size_t) = &memset;*/
-
     memset(v, 0, n);
 #endif
 }
